@@ -78,11 +78,11 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
           let titleEls = datalist.querySelectorAll('option[title]')
           titleEls.forEach(el => select.removeChild(el))
 
-          for (let option of datalist.options) {
+          Array.from(datalist.options).forEach(option => {
             if (option.hasAttribute('label') && option.getAttribute('label').trim() === '') {
               option.removeAttribute('label')
             }
-          }
+          })
 
           return
         }
@@ -90,7 +90,7 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
         let surrogate = document.createElement('author-datalist')
         surrogate.slot = 'input'
 
-        for (let attr of datalist.attributes) {
+        Array.from(datalist.attributes).forEach(attr => {
           if (attr.specified) {
             surrogate.setAttribute(attr.name, attr.value)
 
@@ -98,7 +98,7 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
               datalist.removeAttribute(attr.name)
             }
           }
-        }
+        })
 
         this.removeChild(datalist)
         this.removeChild(input)
@@ -149,11 +149,11 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
         let titleEls = select.querySelectorAll('option[title]')
         titleEls.forEach(el => select.removeChild(el))
 
-        for (let option of select.options) {
+        Array.from(select.options).forEach(option => {
           if (option.hasAttribute('label') && option.getAttribute('label').trim() === '') {
             option.removeAttribute('label')
           }
-        }
+        })
 
         this.UTIL.registerListeners(this.PRIVATE.input, {
           change: this.PRIVATE.inputHandler
@@ -175,7 +175,7 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
         surrogate.slot = 'input'
         surrogate.id = this.PRIVATE.guid
 
-        for (let attr of original.attributes) {
+        Array.from(original.attributes).forEach(attr => {
           if (attr.specified) {
             surrogate.setAttribute(attr.name, attr.value)
 
@@ -183,7 +183,7 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
               original.removeAttribute(attr.name)
             }
           }
-        }
+        })
 
         this.removeChild(original)
         surrogate.inject(original, this.querySelectorAll('label'))
