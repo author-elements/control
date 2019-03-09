@@ -4,6 +4,18 @@
   max-width: 100%;
 }
 
+:host([type="field"]) {
+  flex-direction: column;
+}
+
+:host([type="select"]) {
+  flex-direction: column;
+}
+
+:host([type="toggle"]) {
+  align-items: center;
+}
+
 :host *,
 :host *:before,
 :host *:after {
@@ -14,14 +26,6 @@
   display: none;
   visibility: hidden;
   opacity: 0;
-}
-
-:host([type="field"]) {
-  flex-direction: column;
-}
-
-:host([type="toggle"]) {
-  align-items: center;
 }
 
 :host .label-wrapper {
@@ -37,8 +41,4 @@
 :host([type="toggle"]) .input-wrapper {
   order: -1;
   justify-content: center;
-}
-
-:host([type="select"]) {
-  flex-direction: column;
 }
