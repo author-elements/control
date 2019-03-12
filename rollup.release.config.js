@@ -12,7 +12,7 @@ const banner = `// Copyright (c) ${(new Date()).getFullYear()} ${pkg.author.name
 
 const output = file => {
 	return {
-		name: 'AuthorControlElement',
+		name: 'AuthorFormControlElement',
 		file: `${outdir}/${outfile.replace(require('path').extname(outfile), '')}${file}`,
 		format,
 		banner,
