@@ -1,6 +1,6 @@
 {
   "name": "@author.io/element-control",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "author-control custom element (web component).",
   "main": "dist/author-control.min.js",
   "scripts": {
