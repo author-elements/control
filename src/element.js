@@ -121,10 +121,6 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
         if (this.PRIVATE.toggleInputTypes.indexOf(input.type) >= 0) {
           this.type = 'toggle'
         }
-
-        this.UTIL.registerListeners(this.PRIVATE.input, {
-          input: this.PRIVATE.inputHandler
-        })
       },
 
       initLabel: label => {
@@ -153,10 +149,6 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
           if (option.hasAttribute('label') && option.getAttribute('label').trim() === '') {
             option.removeAttribute('label')
           }
-        })
-
-        this.UTIL.registerListeners(this.PRIVATE.input, {
-          change: this.PRIVATE.inputHandler
         })
       },
 
@@ -190,10 +182,6 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
 
         this.appendChild(surrogate)
         this.PRIVATE.input = surrogate
-
-        this.UTIL.registerListeners(this.PRIVATE.input, {
-          change: this.PRIVATE.inputHandler
-        })
       },
 
       initSelectMenu: select => {
@@ -205,17 +193,6 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
         }
 
         this.PRIVATE.initSelectSurrogate(select, document.createElement('author-select'))
-      },
-
-      inputHandler: evt => this.PRIVATE.validate(evt.target),
-
-      validate: input => {
-        if (input.checkValidity()) {
-          this.removeAttribute('invalid')
-        } else {
-          this.setAttribute('invalid', '')
-          this.emit('invalid')
-        }
       }
     })
 
@@ -263,13 +240,12 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
     })
 
     this.UTIL.registerListeners(this, {
-      connected: () => this.PRIVATE.guid = this.UTIL.generateGuid('control_'),
-      rendered: () => this.PRIVATE.validate(this.PRIVATE.input)
+      connected: () => this.PRIVATE.guid = this.UTIL.generateGuid('control_')
     })
   }
 
   static get observedAttributes () {
-    return ['disabled', 'invalid']
+    return ['disabled']
   }
 
   get input () {
