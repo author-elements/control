@@ -193,15 +193,9 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
         }
 
         this.PRIVATE.initSelectSurrogate(select, document.createElement('author-select'))
-      }
-    })
+      },
 
-    this.UTIL.monitorChildren((mutations, observer) => {
-      let filtered = mutations.filter(record => record.addedNodes.item(0).nodeType !== 3)
-
-      filtered.forEach((record, index, array) => {
-        let node = record.addedNodes.item(0)
-
+      transformChild: node => {
         switch (node.nodeName) {
           case 'LABEL':
             return this.PRIVATE.initLabel(node)
@@ -212,7 +206,7 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
               return this.PRIVATE.initInput(node)
             }
 
-            let adjacentElement = array[index + 1].addedNodes.item(0)
+            let adjacentElement = array[index + 1].addedNodes.item(0);
 
             if (!adjacentElement || adjacentElement.nodeName !== 'DATALIST') {
               return this.PRIVATE.initInput(node)
@@ -231,16 +225,25 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
             return this.PRIVATE.initMultipleSelectMenu(node)
 
           default:
-            this.initialValue = node.value
+            this.initialValue = node.value;
             return
         }
+      }
+    })
+
+    this.UTIL.monitorChildren((mutations, observer) => {
+      let filtered = mutations.filter(record => record.addedNodes.item(0).nodeType !== 3)
+
+      filtered.forEach((record, index, array) => {
+        this.PRIVATE.transformChild(record.addedNodes.item(0))
       })
 
       observer.disconnect()
     })
 
     this.UTIL.registerListeners(this, {
-      connected: () => this.PRIVATE.guid = this.UTIL.generateGuid('control_')
+      connected: () => this.PRIVATE.guid = this.UTIL.generateGuid('control_'),
+      rendered: () => Array.from(this.children).forEach(child => this.PRIVATE.transformChild(child))
     })
   }
 
