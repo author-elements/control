@@ -235,7 +235,13 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
       let filtered = mutations.filter(record => record.addedNodes.item(0).nodeType !== 3)
 
       filtered.forEach((record, index, array) => {
-        this.PRIVATE.transformChild(record.addedNodes.item(0))
+        let node = record.addedNodes.item(0)
+
+        if (!node) {
+          return
+        }
+
+        this.PRIVATE.transformChild(node)
       })
 
       observer.disconnect()
