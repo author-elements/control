@@ -195,18 +195,18 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
         this.PRIVATE.initSelectSurrogate(select, document.createElement('author-select'))
       },
 
-      transformChild: node => {
+      transformChild: (node, collection) => {
         switch (node.nodeName) {
           case 'LABEL':
             return this.PRIVATE.initLabel(node)
 
           case 'INPUT':
             // Check if there is an additional element adjacent to the input
-            if (array[index + 1] === void 0) {
+            if (collection[index + 1] === void 0) {
               return this.PRIVATE.initInput(node)
             }
 
-            let adjacentElement = array[index + 1].addedNodes.item(0);
+            let adjacentElement = collection[index + 1].addedNodes.item(0);
 
             if (!adjacentElement || adjacentElement.nodeName !== 'DATALIST') {
               return this.PRIVATE.initInput(node)
@@ -249,7 +249,7 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
           return
         }
 
-        this.PRIVATE.transformChild(node)
+        this.PRIVATE.transformChild(node, array)
       })
 
       observer.disconnect()
@@ -257,7 +257,7 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
 
     this.UTIL.registerListeners(this, {
       connected: () => this.PRIVATE.guid = this.UTIL.generateGuid('control_'),
-      rendered: () => Array.from(this.children).forEach(child => this.PRIVATE.transformChild(child))
+      rendered: () => Array.from(this.children).forEach((child, index, array) => this.PRIVATE.transformChild(child, array))
     })
   }
 
