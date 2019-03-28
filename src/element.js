@@ -211,7 +211,7 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
               return this.PRIVATE.initInput(node)
             }
 
-            let adjacentElement = collection[index + 1].addedNodes.item(0);
+            let adjacentElement = collection[index + 1];
 
             if (!adjacentElement || adjacentElement.nodeName !== 'DATALIST') {
               return this.PRIVATE.initInput(node)
@@ -254,7 +254,7 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
           return
         }
 
-        this.PRIVATE.transformChild(node, index, array)
+        this.PRIVATE.transformChild(node, index, array.map(mutation => mutation.addedNodes.item(0)))
       })
 
       observer.disconnect()
