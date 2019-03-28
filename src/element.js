@@ -67,7 +67,6 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
         this.type = 'select'
 
         if (!customElements.get('author-datalist')) {
-          console.dir(input);
           input.id = this.PRIVATE.guid
           datalist.id = `${input.id}_datalist`
           input.setAttribute('list', datalist.id)
@@ -103,7 +102,12 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
         this.removeChild(datalist)
         this.removeChild(input)
 
-        surrogate.inject(input, datalist, this.PRIVATE.guid)
+        // Use a select as sourceElement to preserve option indexes, since
+        // datalist doesn't assign indexes to child options
+        let select = document.createElement('select')
+        Array.from(datalist.children).forEach(option => select.add(option))
+
+        surrogate.inject(input, select, this.PRIVATE.guid)
         this.appendChild(surrogate)
         this.PRIVATE.input = surrogate
       },
