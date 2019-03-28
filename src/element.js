@@ -106,6 +106,7 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
         // datalist doesn't assign indexes to child options
         let select = document.createElement('select')
         Array.from(datalist.children).forEach(option => select.add(option))
+        select.selectedIndex = -1
 
         surrogate.inject(input, select, this.PRIVATE.guid)
         this.appendChild(surrogate)
