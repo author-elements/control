@@ -182,8 +182,8 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
           }
         })
 
-        this.removeChild(original)
         surrogate.inject(original, this.querySelectorAll('label'))
+        this.removeChild(original)
 
         this.appendChild(surrogate)
         this.PRIVATE.input = surrogate
