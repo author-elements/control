@@ -202,7 +202,7 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
 
         authorDatalist.inject(inputElement, surrogate, guid)
         this.replaceChild(authorDatalist, datalistSourceElement)
-        this.PRIVATE.input = authorDatalist
+        this.PRIVATE.inputElement = authorDatalist
       },
 
       initDefaultDatalist: () => {
