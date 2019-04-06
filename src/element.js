@@ -11,8 +11,44 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
         default: null
       },
 
+      labels: {
+        readonly: true,
+        get: () => this.PRIVATE.labelElements
+      },
+
+      labelElements: {
+        private: true,
+        default: []
+      },
+
+      datalist: {
+        readonly: true,
+        get: () => this.PRIVATE.datalistElement
+      },
+
+      datalistElement: {
+        private: true,
+        default: null
+      },
+
+      datalistSourceElement: {
+        private: true,
+        default: null
+      },
+
       input: {
-        private: true
+        readonly: true,
+        get: () => this.PRIVATE.inputElement
+      },
+
+      inputElement: {
+        private: true,
+        default: null
+      },
+
+      inputSourceElement: {
+        private: true,
+        default: null
       },
 
       fieldInputTypes: {
@@ -63,176 +99,150 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
     })
 
     this.UTIL.definePrivateMethods({
-      initDatalist: (input, datalist) => {
-        this.type = 'select'
+      catalogChild: node => {
+        switch (node.nodeName) {
+          case 'LABEL':
+            node.htmlFor = this.PRIVATE.guid
+            this.PRIVATE.labelElements.push(node)
+            return
 
-        if (!customElements.get('author-datalist')) {
-          input.id = this.PRIVATE.guid
-          datalist.id = `${input.id}_datalist`
-          input.setAttribute('list', datalist.id)
-          input.slot = input.slot || 'input'
-          // select.setAttribute('role', 'menu')
-          this.PRIVATE.input = input
+          case 'INPUT':
+          case 'TEXTAREA':
+            node.id = this.PRIVATE.guid
+            this.PRIVATE.inputSourceElement = node
+            return
 
-          let titleEls = datalist.querySelectorAll('option[title]')
-          titleEls.forEach(el => select.removeChild(el))
+          case 'SELECT':
+            this.PRIVATE.inputSourceElement = node
+            return
 
-          Array.from(datalist.options).forEach(option => {
-            if (option.hasAttribute('label') && option.getAttribute('label').trim() === '') {
-              option.removeAttribute('label')
+          case 'DATALIST':
+            this.PRIVATE.datalistSourceElement = node
+            return
+
+          default: if (node.children.length > 0) {
+            return Array.from(node.children).forEach(child => this.PRIVATE.catalogChild(child))
+          }
+        }
+      },
+
+      init: () => {
+        this.initialValue = this.PRIVATE.inputSourceElement.value
+
+        switch (this.PRIVATE.inputSourceElement.nodeName) {
+          case 'INPUT':
+            this.PRIVATE.inputElement = this.PRIVATE.inputSourceElement
+
+            if (this.PRIVATE.datalistSourceElement) {
+              this.type = 'datalist'
+
+              if (!customElements.get('author-datalist')) {
+                this.PRIVATE.initDefaultDatalist()
+                break
+              }
+
+              this.PRIVATE.initAuthorDatalist()
+
+            } else if (this.PRIVATE.fieldInputTypes.indexOf(this.PRIVATE.inputElement.type) >= 0) {
+              this.type = 'field'
+            } else if (this.PRIVATE.toggleInputTypes.indexOf(this.PRIVATE.inputElement.type) >= 0) {
+              this.type = 'toggle'
             }
-          })
 
-          return
+            break
+
+          case 'TEXTAREA':
+            this.PRIVATE.inputElement = this.PRIVATE.inputSourceElement
+            this.type = 'textarea'
+            break
+
+          case 'SELECT':
+            this.type = 'select'
+
+            if (!customElements.get('author-select')) {
+              this.PRIVATE.initDefaultSelect()
+              break
+            }
+
+            this.PRIVATE.initAuthorSelect()
+            break
         }
 
-        let surrogate = document.createElement('author-datalist')
-        surrogate.slot = 'input'
+        this.emit('initialized')
+        return console.dir(this);
+      },
 
-        Array.from(datalist.attributes).forEach(attr => {
+      initAuthorDatalist: () => {
+        let { datalistSourceElement, inputElement, guid } = this.PRIVATE
+
+        let authorDatalist = document.createElement('author-datalist')
+
+        Array.from(datalistSourceElement.attributes).forEach(attr => {
           if (attr.specified) {
-            surrogate.setAttribute(attr.name, attr.value)
+            authorDatalist.setAttribute(attr.name, attr.value)
 
             if (attr.name === 'autofocus') {
-              datalist.removeAttribute(attr.name)
+              datalistSourceElement.removeAttribute(attr.name)
             }
           }
         })
 
-        this.removeChild(datalist)
-        this.removeChild(input)
+        this.removeChild(inputElement)
 
         // Use a select as sourceElement to preserve option indexes, since
         // datalist doesn't assign indexes to child options
-        let select = document.createElement('select')
-        Array.from(datalist.children).forEach(option => select.add(option))
-        select.selectedIndex = -1
+        let surrogate = document.createElement('select')
+        Array.from(datalistSourceElement.children).forEach(option => surrogate.add(option))
+        surrogate.selectedIndex = -1
 
-        surrogate.inject(input, select, this.PRIVATE.guid)
-        this.appendChild(surrogate)
-        this.PRIVATE.input = surrogate
+        authorDatalist.inject(inputElement, surrogate, guid)
+        this.replaceChild(authorDatalist, datalistSourceElement)
+        this.PRIVATE.input = authorDatalist
       },
 
-      initInput: input => {
-        input.slot = input.slot || 'input'
-        this.PRIVATE.input = input
-        input.id = this.PRIVATE.guid
-        this.initialValue = input.value
+      initDefaultDatalist: () => {
+        let { datalistSourceElement, inputElement, guid } = this.PRIVATE
 
-        if (this.PRIVATE.fieldInputTypes.indexOf(input.type) >= 0) {
-          this.type = 'field'
-        }
+        datalistSourceElement.id = `${guid}_datalist`
+        inputElement.setAttribute('list', datalistSourceElement.id)
 
-        if (this.PRIVATE.toggleInputTypes.indexOf(input.type) >= 0) {
-          this.type = 'toggle'
-        }
+        this.PRIVATE.datalistElement = datalistSourceElement
       },
 
-      initLabel: label => {
-        this.label = label
-        label.slot = label.slot || 'label'
-        label.htmlFor = this.PRIVATE.guid
+      initDefaultSelect: () => {
+        let { inputSourceElement } = this.PRIVATE
 
-        if (this.type === 'select') {
-          this.label.addEventListener('click', (evt) => {
-            this.input.focus()
-          })
-        }
+        inputSourceElement.id = this.PRIVATE.guid
+        inputSourceElement.setAttribute('role', 'menu')
+
+        this.PRIVATE.inputElement = inputSourceElement
       },
 
-      initDefaultSelect: select => {
-        select.id = this.PRIVATE.guid
-        select.slot = select.slot || 'input'
-        select.setAttribute('role', 'menu')
-        this.PRIVATE.input = select
+      initAuthorSelect: () => {
+        let { inputSourceElement } = this.PRIVATE
+        let authorSelect = document.createElement('author-select')
 
-        // Purge incompatible attributes
-        let titleEls = select.querySelectorAll('option[title]')
-        titleEls.forEach(el => select.removeChild(el))
+        authorSelect.id = this.PRIVATE.guid
 
-        Array.from(select.options).forEach(option => {
-          if (option.hasAttribute('label') && option.getAttribute('label').trim() === '') {
-            option.removeAttribute('label')
-          }
-        })
-      },
-
-      initMultipleSelectMenu: select => {
-        this.type = 'select'
-        this.initialValue = select.selectedOptions
-
-        if (!customElements.get('author-select')) {
-          return this.PRIVATE.initDefaultSelect(select)
-        }
-
-        this.PRIVATE.initSelectSurrogate(select, document.createElement('author-select'))
-      },
-
-      initSelectSurrogate: (original, surrogate) => {
-        surrogate.slot = 'input'
-        surrogate.id = this.PRIVATE.guid
-
-        Array.from(original.attributes).forEach(attr => {
+        Array.from(inputSourceElement.attributes).forEach(attr => {
           if (attr.specified) {
-            surrogate.setAttribute(attr.name, attr.value)
+            authorSelect.setAttribute(attr.name, attr.value)
 
             if (attr.name === 'autofocus') {
-              original.removeAttribute(attr.name)
+              inputSourceElement.removeAttribute(attr.name)
             }
           }
         })
 
-        surrogate.inject(original, this.querySelectorAll('label'))
-        this.removeChild(original)
+        authorSelect.inject(inputSourceElement, this.labels)
 
-        this.appendChild(surrogate)
-        this.PRIVATE.input = surrogate
-      },
+        this.replaceChild(authorSelect, inputSourceElement)
+        this.PRIVATE.inputElement = authorSelect
 
-      initSelectMenu: select => {
-        this.type = 'select'
-        this.initialValue = select.selectedIndex
-
-        if (!customElements.get('author-select')) {
-          return this.PRIVATE.initDefaultSelect(select)
-        }
-
-        this.PRIVATE.initSelectSurrogate(select, document.createElement('author-select'))
-      },
-
-      transformChild: (node, index, collection) => {
-        switch (node.nodeName) {
-          case 'LABEL':
-            return this.PRIVATE.initLabel(node)
-
-          case 'INPUT':
-            // Check if there is an additional element adjacent to the input
-            if (collection[index + 1] === void 0) {
-              return this.PRIVATE.initInput(node)
-            }
-
-            let adjacentElement = collection[index + 1];
-
-            if (!adjacentElement || adjacentElement.nodeName !== 'DATALIST') {
-              return this.PRIVATE.initInput(node)
-            }
-
-            return this.PRIVATE.initDatalist(node, adjacentElement)
-
-          case 'TEXTAREA':
-            return this.PRIVATE.initInput(node)
-
-          case 'SELECT':
-            if (!node.multiple) {
-              return this.PRIVATE.initSelectMenu(node)
-            }
-
-            return this.PRIVATE.initMultipleSelectMenu(node)
-
-          default:
-            this.initialValue = node.value;
-            return
-        }
+        // This is required for label clicks to focus author-select
+        this.labels.forEach(label => {
+          this.UTIL.registerListener(label, 'click', evt => this.PRIVATE.inputElement.focus())
+        })
       }
     })
 
@@ -254,32 +264,21 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
           return
         }
 
-        this.PRIVATE.transformChild(node, index, array.map(mutation => mutation.addedNodes.item(0)))
+        this.PRIVATE.catalogChild(node)
+        // this.PRIVATE.transformChild(node, index, array.map(mutation => mutation.addedNodes.item(0)))
       })
 
       observer.disconnect()
+      this.PRIVATE.init()
     })
 
     this.UTIL.registerListeners(this, {
-      connected: () => this.PRIVATE.guid = this.UTIL.generateGuid('control_'),
-      rendered: () => Array.from(this.children).forEach((child, index, array) => this.PRIVATE.transformChild(child, index, array))
+      connected: () => this.PRIVATE.guid = this.UTIL.generateGuid('control_')
     })
   }
 
   static get observedAttributes () {
     return ['disabled']
-  }
-
-  get input () {
-    return this.PRIVATE.input
-  }
-
-  set input (input) {
-    if (this.input) {
-      return console.warn(`Setting <${this.localName}> child input programmatically is not allowed.`)
-    }
-
-    this.PRIVATE.input = input
   }
 }
 

@@ -1,44 +1,11 @@
 :host {
-  display: flex;
+  display: block;
   contain: style;
   max-width: 100%;
-}
-
-:host([type="field"]) {
-  flex-direction: column;
-}
-
-:host([type="select"]) {
-  flex-direction: column;
-}
-
-:host([type="toggle"]) {
-  align-items: center;
 }
 
 :host *,
 :host *:before,
 :host *:after {
   box-sizing: border-box;
-}
-
-:host .hidden {
-  display: none;
-  visibility: hidden;
-  opacity: 0;
-}
-
-:host .label-wrapper {
-  flex: 1 1 auto;
-  display: flex;
-}
-
-:host .input-wrapper {
-  display: flex;
-  align-items: center;
-}
-
-:host([type="toggle"]) .input-wrapper {
-  order: -1;
-  justify-content: center;
 }
