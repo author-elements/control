@@ -36,7 +36,7 @@
     </header>
 
     <main>
-      <div class="content">
+      <form class="content">
         <author-control class="theme">
           <label>Theme</label>
           <select placeholder="Select a Theme">
@@ -46,8 +46,37 @@
           </select>
         </author-control>
 
-        <author-control>
-          <label>Datalist</label>
+        <author-control id="input">
+          <label>Text Input</label>
+          <input type="text" required>
+        </author-control>
+
+        <author-control id="textarea">
+          <label>Textarea</label>
+          <textarea rows="8"></textarea>
+        </author-control>
+
+        <author-control id="select">
+          <label>Select Menu</label>
+
+          <select placeholder="Select an Option">
+            <option value="1">Option 1</option>
+            <option value="2">Option 2</option>
+            <option value="3">Option 3</option>
+
+            <optgroup label="Grouped Options">
+              <option value="4">Option 4</option>
+              <option value="5">Option 5</option>
+              <option value="6">Option 6</option>
+            </optgroup>
+          </select>
+        </author-control>
+
+        <author-control id="datalist">
+          <div class="label-wrapper">
+            <label>Datalist</label>
+          </div>
+
           <input type="text">
           <datalist>
             <option value="1">Option 1</option>
@@ -56,25 +85,17 @@
           </datalist>
         </author-control>
 
-        <author-control>
-          <label>Text Input</label>
-          <input type="text">
-        </author-control>
+        <button type="submit" class="submit">Submit</button>
 
-        <author-control>
-          <label>Textarea</label>
-          <textarea rows="8"></textarea>
-        </author-control>
-
-        <author-control>
+        <!-- <author-control>
           <div class="label-wrapper">
             <label>Text Input</label>
           </div>
           <div class="input-wrapper">
             <input type="text">
           </div>
-        </author-control>
-      </div>
+        </author-control> -->
+      </form>
     </main>
   </body>
 

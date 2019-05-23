@@ -126,7 +126,7 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
             return
 
           default: if (node.children.length > 0) {
-            return Array.from(node.children).forEach(child => this.PRIVATE.catalogChild(child))
+            Array.from(node.children).forEach(child => this.PRIVATE.catalogChild(child))
           }
         }
       },
@@ -170,6 +170,48 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
             }
 
             this.PRIVATE.initAuthorSelect()
+            break
+        }
+
+        this.UTIL.registerListener(this.input, 'invalid', evt => this.emit('invalid', {}))
+
+        switch (this.type) {
+          case 'input':
+          case 'textarea':
+            // this.UTIL.defineProperties({
+            //   leng
+            // })
+
+            break
+
+          case 'select':
+          case 'datalist':
+            this.UTIL.defineProperties({
+              length: {
+                readonly: true,
+                get: () => this.input.length
+              },
+
+              selectedIndex: {
+                set: value => this.input.selectedIndex = value,
+                get: () => this.input.selectedIndex
+              }
+            })
+
+            ;[
+              'add',
+              'deselectAll',
+              'addFilter',
+              'hasFilter',
+              'removeAllFilters',
+              'removeFilter',
+              'item',
+              'namedItem',
+              'remove',
+              'reportValidity',
+              'setCustomValidity'
+            ].forEach(method => this[method] = (...args) => this.input[method](...args))
+
             break
         }
 
@@ -262,6 +304,30 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
 
   static get observedAttributes () {
     return ['disabled']
+  }
+
+  get value () {
+    return this.input.value
+  }
+
+  blur () {
+    this.input.blur()
+  }
+
+  checkValidity () {
+    this.input.checkValidity()
+  }
+
+  clear () {
+    if ('clear' in this.input) {
+      return this.input.clear()
+    }
+
+    this.input.value = ''
+  }
+
+  focus () {
+    this.input.focus()
   }
 }
 
