@@ -147,11 +147,17 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
               }
 
               this.PRIVATE.initAuthorDatalist()
+              break
+            }
 
-            } else if (this.PRIVATE.fieldInputTypes.indexOf(this.PRIVATE.inputElement.type) >= 0) {
+            if (this.PRIVATE.fieldInputTypes.indexOf(this.PRIVATE.inputElement.type) >= 0) {
               this.type = 'field'
-            } else if (this.PRIVATE.toggleInputTypes.indexOf(this.PRIVATE.inputElement.type) >= 0) {
+              break
+            }
+
+            if (this.PRIVATE.toggleInputTypes.indexOf(this.PRIVATE.inputElement.type) >= 0) {
               this.type = 'toggle'
+              break
             }
 
             break
@@ -308,6 +314,10 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
 
   get value () {
     return this.input.value
+  }
+
+  set value (value) {
+    this.input.value = value
   }
 
   blur () {
