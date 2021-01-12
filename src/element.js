@@ -169,13 +169,7 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
 
           case 'SELECT':
             this.type = 'select'
-
-            if (!customElements.get('author-select')) {
-              this.PRIVATE.initDefaultSelect()
-              break
-            }
-
-            this.PRIVATE.initAuthorSelect()
+            this.PRIVATE.initSelect()
             break
         }
 
@@ -262,40 +256,13 @@ class AuthorFormControlElement extends AuthorBaseElement(HTMLElement) {
         this.PRIVATE.datalistElement = datalistSourceElement
       },
 
-      initDefaultSelect: () => {
+      initSelect: () => {
         let { inputSourceElement } = this.PRIVATE
 
         inputSourceElement.id = this.PRIVATE.guid
         inputSourceElement.setAttribute('role', 'menu')
 
         this.PRIVATE.inputElement = inputSourceElement
-      },
-
-      initAuthorSelect: () => {
-        let { inputSourceElement } = this.PRIVATE
-        let authorSelect = document.createElement('author-select')
-
-        authorSelect.id = this.PRIVATE.guid
-
-        Array.from(inputSourceElement.attributes).forEach(attr => {
-          if (attr.specified) {
-            authorSelect.setAttribute(attr.name, attr.value)
-
-            if (attr.name === 'autofocus') {
-              inputSourceElement.removeAttribute(attr.name)
-            }
-          }
-        })
-
-        authorSelect.inject(inputSourceElement, this.labels)
-
-        this.replaceChild(authorSelect, inputSourceElement)
-        this.PRIVATE.inputElement = authorSelect
-
-        // This is required for label clicks to focus author-select
-        this.labels.forEach(label => {
-          this.UTIL.registerListener(label, 'click', evt => this.PRIVATE.inputElement.focus())
-        })
       }
     })
 
