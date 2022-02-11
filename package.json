@@ -61,7 +61,7 @@
     "@author.io/karma-customelements": "^1.1.11",
     "@author.io/rollup-plugin-wcbuilder": "^1.1.4",
     "fs-extra": "^7.0.1",
-    "karma": "^4.0.0",
+    "karma": "^6.3.14",
     "rollup": "^1.1.0",
     "rollup-plugin-buble": "^0.19.6",
     "rollup-plugin-terser": "^4.0.2",
